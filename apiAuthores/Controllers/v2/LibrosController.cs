@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace apiAuthores.Controllers
+namespace apiAuthores.Controllers.v2
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -13,7 +13,20 @@ namespace apiAuthores.Controllers
         public LibrosController(AppDBContext dbContext) => context = dbContext;
 
         [HttpGet]
-        public async Task<ActionResult<List<Libro>>> Get()
+        [HttpGet("default")] //asi responde a las 2 rutas; y asi se puede a poner a varias rutas.
+        public async Task<ActionResult<Libro>> Get()
+        {
+            return await context.Libros.Include(x => x.Autor).FirstOrDefaultAsync();
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<Libro>> GetById(int id)
+        {
+            return await context.Libros.Include(x => x.Autor).FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        [HttpGet("list")]
+        public async Task<ActionResult<List<Libro>>> GetList()
         {
             return await context.Libros.Include(x => x.Autor).ToListAsync();
         }
